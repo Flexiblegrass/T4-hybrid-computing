@@ -1,6 +1,9 @@
 # NAMA  : Najmi Sabila Almusfiroh
 # NPM   : 247006111125
 # KELAS : E
+# Menjalankan mpi_hybrid_processpool.py untuk 9 kombinasi
+# (rank MPI x worker) secara otomatis, lalu menghitung Speedup & Efisiensi
+# dan mencetaknya dalam bentuk tabel.
 
 import subprocess, re, sys
 
@@ -22,7 +25,7 @@ for r in RANKS:
         m = re.search(r"Makespan\s*:\s*([\d.]+)", out)
         hasil[(r, w)] = float(m.group(1)) if m else None
 
-T1 = hasil[(1, 1)]  
+T1 = hasil[(1, 1)]   # baseline: 1 rank x 1 worker
 
 print(f"\n{'Rank':>5}{'Worker':>8}{'n':>5}{'Makespan(s)':>13}{'Speedup':>10}{'Efisiensi':>11}")
 for r in RANKS:

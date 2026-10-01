@@ -1,14 +1,20 @@
 # NAMA  : Najmi Sabila Almusfiroh
 # NPM   : 247006111125
 # KELAS : E
+# FILE MODIFIKASI DARI KODE SLIDE 19 (Praktikum 1 - Hybrid Pipeline)
+# Bagian yang diubah/ditambahkan dari kode asli slide ditandai "[UBAH]".
 
 import os, sys, time, threading, queue, string
 from concurrent.futures import ProcessPoolExecutor, as_completed
 
-DATA_DIR = "./data"                                 
+DATA_DIR = "./data"                                  
 
-N_LOADER_THREADS = int(sys.argv[1]) if len(sys.argv) > 1 else 2   
-N_WORKERS        = int(sys.argv[2]) if len(sys.argv) > 2 else 4  
+# [UBAH] Parameter dibuat dapat diatur lewat argumen command line
+#        (kode asli slide memakai nilai tetap N_LOADER_THREADS=2, N_WORKERS=4, Q_MAX=32).
+#        Tujuannya agar mudah menjalankan 24 kombinasi B1 tanpa mengedit kode.
+
+N_LOADER_THREADS = int(sys.argv[1]) if len(sys.argv) > 1 else 2  
+N_WORKERS        = int(sys.argv[2]) if len(sys.argv) > 2 else 4   
 Q_MAX            = int(sys.argv[3]) if len(sys.argv) > 3 else 32  
 
 def cpu_task(path):
@@ -16,14 +22,14 @@ def cpu_task(path):
     with open(path, "rb") as f:
         data = f.read()
     text = data.decode(errors="ignore").lower()
-    alpha = sum(c in string.ascii_lowercase for c in text) 
+    alpha = sum(c in string.ascii_lowercase for c in text)
     latency = time.time() - t0
     return {"path": path, "alpha": alpha, "latency": latency}
 
 def loader_worker(q, files):
     for p in files:
-        q.put(p)           
-    q.put(None)             
+        q.put(p)            
+    q.put(None)            
 
 def run_pipeline():
     files = [os.path.join(DATA_DIR, f) for f in os.listdir(DATA_DIR)

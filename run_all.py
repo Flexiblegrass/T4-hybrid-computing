@@ -1,6 +1,9 @@
 # NAMA  : Najmi Sabila Almusfiroh
 # NPM   : 247006111125
 # KELAS : E
+# Menjalankan hybrid_pipeline.py untuk 24 kombinasi
+# (N_LOADER_THREADS x N_WORKERS x Q_MAX) secara otomatis, lalu mencetak
+# tabel hasil dan menyimpannya ke hasil_b1.csv (dipakai buat_grafik.py).
 
 import subprocess, re, sys
 print("="*55)

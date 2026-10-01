@@ -1,6 +1,8 @@
 # NAMA  : Najmi Sabila Almusfiroh
 # NPM   : 247006111125
 # KELAS : E
+# FILE MODIFIKASI DARI KODE SLIDE 21 (Praktikum 3 - Global Word Count)
+# Bagian yang diubah/ditambahkan dari kode asli slide ditandai "[UBAH]".
 
 from mpi4py import MPI
 from concurrent.futures import ThreadPoolExecutor, ProcessPoolExecutor, as_completed
@@ -11,9 +13,10 @@ comm = MPI.COMM_WORLD
 rank = comm.Get_rank()
 size = comm.Get_size()
 
-DATA_DIR = "./data_wc"
+DATA_DIR = "./data_wc"            # [UBAH] folder dataset TEKS NYATA (asli slide: data dummy)
 N_WORKERS = 4
-STOPWORDS = {"dan", "yang", "di", "the", "of", "and"} 
+STOPWORDS = {"dan", "yang", "di", "the", "of", "and"}   # [UBAH] daftar stopwords yang dibuang
+
 def count_file(path):
     with open(path, "r", encoding="utf-8", errors="ignore") as f:
         txt = f.read().lower()
@@ -26,8 +29,10 @@ def chunk_range(total, parts, idx):
     end = start + base + (1 if idx < rem else 0)
     return start, end
 
+# [UBAH] Fungsi pemroses dibuat bisa dua mode: "threads" atau "processes".
+#        Kode asli slide hanya memakai ThreadPool; di sini ditambah opsi ProcessPool
+#        agar waktu keduanya bisa dibandingkan (permintaan soal B3).
 def proses(my_files, mode):
-
     t0 = time.time()
     local = Counter()
     Pool = ThreadPoolExecutor if mode == "threads" else ProcessPoolExecutor
@@ -37,7 +42,6 @@ def proses(my_files, mode):
     return local, time.time() - t0
 
 if __name__ == "__main__":
-
     all_files = None
     if rank == 0:
         all_files = sorted(os.path.join(DATA_DIR, f) for f in os.listdir(DATA_DIR)
@@ -47,15 +51,16 @@ if __name__ == "__main__":
     start, end = chunk_range(len(all_files), size, rank)
     my_files = all_files[start:end]
 
-    local_t, time_threads = proses(my_files, "threads")
-
-    local_p, time_proc = proses(my_files, "processes")
+    # [UBAH] jalankan DUA versi pemrosesan lalu catat waktunya masing-masing
+    local_t, time_threads = proses(my_files, "threads")     # versi (a) ThreadPool
+    local_p, time_proc    = proses(my_files, "processes")   # versi (b) ProcessPool
 
     gathered = comm.gather(local_t, root=0)
     gt = comm.reduce(time_threads, op=MPI.MAX, root=0)   
     gp = comm.reduce(time_proc,    op=MPI.MAX, root=0)
 
     if rank == 0:
+        # [UBAH] cetak identitas (bukti kepemilikan)
         print("="*55)
         print("NAMA  : Najmi Sabila Almusfiroh")
         print("NPM   : 247006111125")
@@ -65,6 +70,7 @@ if __name__ == "__main__":
         for c in gathered:
             global_counter += c
 
+        # [UBAH] buang stopwords sebelum mengambil 10 kata teratas
         for sw in STOPWORDS:
             global_counter.pop(sw, None)
 
@@ -73,6 +79,6 @@ if __name__ == "__main__":
         print(f"Waktu versi ProcessPool : {gp:.4f} s")
         lebih = "ThreadPool" if gt < gp else "ProcessPool"
         print(f"Lebih cepat: {lebih}")
-        print("\n10 kata teratas (setelah stopwords dibuang):")
+        print("\n10 kata teratas (setelah stopwords dibuang):")   # [UBAH] tampilkan top-10
         for w, c in global_counter.most_common(10):
             print(f"  {w:>12} : {c}")

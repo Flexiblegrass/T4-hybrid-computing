@@ -1,6 +1,8 @@
 # NAMA  : Najmi Sabila Almusfiroh
 # NPM   : 247006111125
 # KELAS : E
+# Membuat grafik throughput vs N_WORKERS
+# dari file hasil_b1.csv (keluaran run_all.py) -> grafik_b1.png
 
 import csv, matplotlib
 matplotlib.use("Agg")

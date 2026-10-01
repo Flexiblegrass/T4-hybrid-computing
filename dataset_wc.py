@@ -1,7 +1,9 @@
 # NAMA  : Najmi Sabila Almusfiroh
 # NPM   : 247006111125
 # KELAS : E
-# Sumber teks: public domain (Alice's Adventures in Wonderland - Lewis Carroll).
+# Membuat dataset TEKS NYATA sebanyak 35 file (min. 30)
+# untuk program word count. Sumber teks: public domain
+# (Alice's Adventures in Wonderland - Lewis Carroll).
 
 import os, pathlib
 print("="*55)
@@ -32,8 +34,9 @@ had plenty of time as she went down to look about her and to wonder what was goi
 happen next. The the the and and and of of yang yang dan dan di di world data parallel.
 """
 pathlib.Path("data_wc").mkdir(exist_ok=True)
-JUMLAH = 35   
+JUMLAH = 35  
 for i in range(1, JUMLAH + 1):
+    # teks diulang beberapa kali + sedikit variasi per file
     isi = (TEKS + f"\nfile nomor {i} chapter {i} parallel distributed computing.\n") * 6
     open(f"data_wc/doc_{i:03d}.txt", "w", encoding="utf-8").write(isi)
 print(f"done. {JUMLAH} file teks nyata dibuat di folder ./data_wc")
