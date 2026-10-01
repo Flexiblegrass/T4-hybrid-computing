@@ -1,14 +1,14 @@
 # NAMA  : Najmi Sabila Almusfiroh
 # NPM   : 247006111125
 # KELAS : E
+# Parameter A = 5 (digit terakhir NPM) -> SAMPLES_PER_TASK = 200000 + 10000*5 = 250000
 
+import mpi4py
+mpi4py.rc.initialize = False
+mpi4py.rc.finalize = False
 from mpi4py import MPI
 from concurrent.futures import ProcessPoolExecutor
 import numpy as np, time, sys
-
-comm = MPI.COMM_WORLD
-rank = comm.Get_rank()
-size = comm.Get_size()
 
 def mc_pi(n_samples, seed):
     rng = np.random.default_rng(seed)
@@ -27,9 +27,13 @@ def chunk_range(total, parts, idx):
     return start, end
 
 if __name__ == "__main__":
-    TOTAL_TASKS = 8
-    SAMPLES_PER_TASK = 200_000 + 10_000 * 5   
+    MPI.Init()                     
+    comm = MPI.COMM_WORLD
+    rank = comm.Get_rank()
+    size = comm.Get_size()
 
+    TOTAL_TASKS = 8
+    SAMPLES_PER_TASK = 200_000 + 10_000 * 5    
     WORKERS = int(sys.argv[1]) if len(sys.argv) > 1 else 4
 
     start, end = chunk_range(TOTAL_TASKS, size, rank)
@@ -37,7 +41,6 @@ if __name__ == "__main__":
 
     t0 = time.time()
     with ProcessPoolExecutor(max_workers=WORKERS) as ex:
- 
         args = [(k, SAMPLES_PER_TASK, 1234 + rank * 1000) for k in my_tasks]
         hits = list(ex.map(run_task, args))
     local_hits = sum(hits)
@@ -59,3 +62,4 @@ if __name__ == "__main__":
         print(f"Makespan     : {makespan:.3f} s")
         print(f"Total samples : {global_samp:,}")
         print(f"Estimasi pi   : {pi_est:.6f}")
+    MPI.Finalize()
